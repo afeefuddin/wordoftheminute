@@ -1,2 +1,4 @@
 -- name: GetWords :many
-SELECT * from wordoftheminutes;
+SELECT * FROM wordoftheminutes
+ORDER BY id DESC
+LIMIT $1 OFFSET $2;

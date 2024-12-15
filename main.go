@@ -165,6 +165,7 @@ func initRedis() {
 }
 
 func persistData() {
+	broadCastCh <- "##"
 	curr := utils.ThisMinute()
 	log.Println("Running the job")
 
@@ -173,8 +174,6 @@ func persistData() {
 	if err != nil {
 		return
 	}
-
-	// log.Printf("%v", allKeys)
 
 	for _, timeStamp := range allKeys {
 		if timeStamp == curr {
@@ -245,7 +244,7 @@ func scheduleJobs() {
 	if err != nil {
 		// try forever
 		log.Print(err)
-		scheduleJobs()
+		log.Fatal("error connecting")
 	}
 	_, err = s.NewJob(gocron.CronJob("* * * * *", true), gocron.NewTask(persistData))
 	if err != nil {
@@ -274,7 +273,7 @@ func main() {
 	initRedis()
 
 	broadCastCh = make(chan string)
-	go scheduleJobs()
+	scheduleJobs()
 	go wsServer.broadCastEverySecond()
 	go func() {
 		for {
@@ -305,6 +304,7 @@ func main() {
 
 	router.Get("/", handlerReadiness)
 	router.Get("/connect", wsServer.webSocketHandler)
+	router.Get("/history", handlerPastWords)
 
 	log.Printf("Server starting on port %v", port)
 	err := srv.ListenAndServe()

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func JsonResponse(w http.ResponseWriter, code int, payload interface{}){
+func JsonResponse(w http.ResponseWriter, code int, payload interface{}) {
 	data, err := json.Marshal(payload)
 
 	if err != nil {
@@ -19,4 +19,10 @@ func JsonResponse(w http.ResponseWriter, code int, payload interface{}){
 	w.WriteHeader(code)
 	w.Write(data)
 
+}
+
+func JsonError(w http.ResponseWriter, code int) {
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
 }

@@ -10,11 +10,18 @@ import (
 )
 
 const getWords = `-- name: GetWords :many
-SELECT id, first, second, third from wordoftheminutes
+SELECT id, first, second, third FROM wordoftheminutes
+ORDER BY id DESC
+LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) GetWords(ctx context.Context) ([]Wordoftheminute, error) {
-	rows, err := q.db.QueryContext(ctx, getWords)
+type GetWordsParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetWords(ctx context.Context, arg GetWordsParams) ([]Wordoftheminute, error) {
+	rows, err := q.db.QueryContext(ctx, getWords, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
