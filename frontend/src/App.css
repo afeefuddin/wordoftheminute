@@ -1,0 +1,15 @@
+.words-list {
+  transition: all 0.5s;
+}
+
+.words-list-enter {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.words-list-exit-to {
+  opacity: 0;
+  transform: translateY(0px);
+}
+.words-list-exit-active {
+  position: absolute;
+}
