@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/TwiN/go-away v1.6.14 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-co-op/gocron/v2 v2.13.0 // indirect
@@ -21,4 +22,5 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
+	golang.org/x/text v0.21.0 // indirect
 )

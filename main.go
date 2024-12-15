@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/TwiN/go-away"
 	"github.com/afeefuddin/wordoftheminute/internal/database"
 	"github.com/afeefuddin/wordoftheminute/utils"
 	"github.com/go-chi/chi"
@@ -49,6 +50,11 @@ var upgrader = websocket.Upgrader{
 }
 
 func writeToRedis(clientId, word string) {
+	isProfane := goaway.IsProfane(word)
+	if isProfane {
+		log.Printf("Profane")
+		return
+	}
 	curMin := utils.ThisMinute()
 
 	clientKey := fmt.Sprintf("%v:%v", curMin, clientId)
