@@ -16,7 +16,8 @@ export const WebSocketProvider = (props: { children: JSX.Element }) => {
   const [ws, setWs] = createSignal<WebSocket | null>(null);
 
   const initializeWebSocket = () => {
-    const socket = new WebSocket("ws://localhost:8000/connect");
+    const websocker_url = import.meta.env.VITE_WEBSOCKET_URL;
+    const socket = new WebSocket(websocker_url);
 
     socket.onopen = () => {
       console.log("WebSocket is open now.");
