@@ -150,6 +150,7 @@ func initDb() {
 		log.Fatal("Err connecting to db")
 	}
 	DbClient = database.New(db)
+
 }
 
 func initRedis() {
@@ -157,13 +158,17 @@ func initRedis() {
 	if host == "" {
 		log.Fatal("Redis host url not found")
 	}
-	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		DB:       0,
-		Password: "",
-	})
 
-	_, err := RedisClient.Ping(context.Background()).Result()
+	log.Println(host)
+
+	opt, err := redis.ParseURL(host)
+	if err != nil {
+		log.Fatal("Error parsing the url")
+	}
+
+	RedisClient = redis.NewClient(opt)
+
+	_, err = RedisClient.Ping(context.Background()).Result()
 
 	if err != nil {
 		log.Fatal("Error connecting to redis")
