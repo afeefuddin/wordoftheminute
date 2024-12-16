@@ -45,7 +45,17 @@ export default function History() {
                 {data()?.map((w) => (
                   <tr>
                     <td class="p-4 border-b border-gray-300">
-                      {new Date(w.Timestamp).toDateString()}
+                      {new Date(parseInt(w.Timestamp) * 1000).toLocaleString(
+                        "en-GB",
+                        {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        }
+                      )}
                     </td>
                     <td class="p-4 border-b border-gray-300">{w.First}</td>
                     <td class="p-4 border-b border-gray-300">{w.Second}</td>
