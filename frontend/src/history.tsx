@@ -44,7 +44,9 @@ export default function History() {
               <tbody class="overflow-x-auto">
                 {data()?.map((w) => (
                   <tr>
-                    <td class="p-4 border-b border-gray-300">{w.Timestamp}</td>
+                    <td class="p-4 border-b border-gray-300">
+                      {new Date(w.Timestamp).toDateString()}
+                    </td>
                     <td class="p-4 border-b border-gray-300">{w.First}</td>
                     <td class="p-4 border-b border-gray-300">{w.Second}</td>
                     <td class="p-4 border-b border-gray-300">{w.Third}</td>

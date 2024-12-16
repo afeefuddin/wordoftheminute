@@ -1,9 +1,10 @@
-import { createEffect, createSignal, For } from "solid-js";
+import { createEffect, For } from "solid-js";
 import "./App.css";
 import Header from "./components/header";
 import { useWebSocket } from "./context/webSocketContext";
 import MessageInput from "./components/input";
 import { TransitionGroup } from "solid-transition-group";
+import { useDataEntry } from "./context/dataEntriesContext";
 
 interface DataEntry {
   key: string;
@@ -13,7 +14,7 @@ interface DataEntry {
 function App() {
   const { ws, initializeWebSocket } = useWebSocket();
 
-  const [dataEntries, setDataEntries] = createSignal<DataEntry[]>([]);
+  const { dataEntries, setDataEntries } = useDataEntry();
 
   createEffect(() => {
     if (!ws()) {

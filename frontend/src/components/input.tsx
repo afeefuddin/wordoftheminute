@@ -22,8 +22,15 @@ export default function MessageInput() {
           type="text"
           value={message()}
           onInput={(e) => setMessage(e.target.value)}
+          onBeforeInput={(e) => {
+            const data = e.data;
+            if (data && (!/^[a-zA-Z]*$/.test(data) || message().length >= 45)) {
+              e.preventDefault();
+            }
+          }}
           placeholder="Type your message..."
         />
+
         <button
           class="bg-blue-600 text-white px-4 py-2 rounded"
           type="submit"
