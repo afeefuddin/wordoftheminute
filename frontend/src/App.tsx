@@ -67,7 +67,7 @@ function App() {
           )
           .sort((a, b) => {
             if (a.value === b.value) {
-              return a.key.localeCompare(b.key);
+              return b.key.localeCompare(a.key);
             } else {
               return b.value - a.value;
             }
