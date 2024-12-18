@@ -159,9 +159,7 @@ func isProfaneWord(word string) bool {
 }
 
 func writeToRedis(clientId, word string) {
-	if isProfaneWord(word) {
-		return
-	}
+
 	curMin := utils.ThisMinute()
 
 	clientKey := fmt.Sprintf("%v:%v", curMin, clientId)
@@ -173,6 +171,10 @@ func writeToRedis(clientId, word string) {
 	}
 
 	RedisClient.Set(ctx, clientKey, 1, 60*time.Second)
+
+	if isProfaneWord(word) {
+		return
+	}
 
 	// sorted set
 	RedisClient.ZIncrBy(ctx, curMin, 1, word)
