@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -49,10 +52,114 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func writeToRedis(clientId, word string) {
+type RequestBody struct {
+	AttributeScores struct {
+		Toxicity struct {
+			SummaryScore struct {
+				Value float64 `json:"value"`
+				Type  string  `json:"type"`
+			} `json:"summaryScore"`
+		} `json:"TOXICITY"`
+	} `json:"attributeScores"`
+	Languages []string `json:"languages"`
+}
+
+type ReqBody struct {
+	Comment struct {
+		Text string `json:"text"`
+	} `json:"comment"`
+	Languages           []string               `json:"languages"`
+	RequestedAttributes map[string]interface{} `json:"requestedAttributes"`
+}
+
+func checkFromPerspective(word string) bool {
+	api_key := os.Getenv("PERSPECTIVE_API_KEY")
+	if api_key == "" {
+		return false
+	}
+	requestBody := ReqBody{
+		Comment: struct {
+			Text string `json:"text"`
+		}{
+			Text: word,
+		},
+		Languages: []string{"en", "hi", "hi-Latn"},
+		RequestedAttributes: map[string]interface{}{
+			"TOXICITY": struct{}{},
+		},
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		log.Println("Error marshaling request body:", err)
+		return false
+	}
+
+	req, err := http.NewRequest("POST", "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key="+api_key, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		log.Println("Error creating request:", err)
+		return false
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error making API call:", err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error reading response body:", err)
+		return false
+	}
+
+	var respBody RequestBody
+	err = json.Unmarshal(body, &respBody)
+	if err != nil {
+		log.Println("Error decoding response body:", err)
+		return false
+	}
+
+	if respBody.AttributeScores.Toxicity.SummaryScore.Value > 0.3 {
+		RedisClient.SAdd(ctx, "profaneword", word)
+		return true
+	} else {
+		RedisClient.SAdd(ctx, "notprofane", word)
+	}
+	return false
+}
+
+func isProfaneWord(word string) bool {
 	isProfane := goaway.IsProfane(word)
 	if isProfane {
-		log.Printf("Profane")
+		return true
+	}
+
+	res, err := RedisClient.SIsMember(ctx, "profaneword", word).Result()
+	if err != nil {
+		log.Print(err)
+	}
+
+	if res {
+		return true
+	}
+
+	res, err = RedisClient.SIsMember(ctx, "notprofane", word).Result()
+	if err != nil {
+		log.Print(err)
+	}
+
+	if res {
+		return false
+	}
+
+	return checkFromPerspective(word)
+}
+
+func writeToRedis(clientId, word string) {
+	if isProfaneWord(word) {
 		return
 	}
 	curMin := utils.ThisMinute()
@@ -200,8 +307,6 @@ func persistData() {
 			return
 		}
 
-		fmt.Printf("%v", data)
-
 		first, second, third := sql.NullString{
 			String: "",
 			Valid:  false,
@@ -253,8 +358,6 @@ func persistData() {
 func scheduleJobs() {
 	s, err := gocron.NewScheduler()
 	if err != nil {
-		// try forever
-		log.Print(err)
 		log.Fatal("error connecting")
 	}
 	_, err = s.NewJob(gocron.CronJob("* * * * *", true), gocron.NewTask(persistData))
