@@ -176,6 +176,8 @@ func writeToRedis(clientId, word string) {
 		return
 	}
 
+	word = utils.CleanseWord(word)
+
 	// sorted set
 	RedisClient.ZIncrBy(ctx, curMin, 1, word)
 
