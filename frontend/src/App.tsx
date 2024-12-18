@@ -80,7 +80,7 @@ function App() {
 
   return (
     <div class="bg-gray-200 h-screen flex flex-col">
-      <Header />
+      <Header showTimer/>
       {ws() === null ? (
         <div class="flex items-center justify-center h-full">Connecting...</div>
       ) : (
