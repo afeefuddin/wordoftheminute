@@ -107,6 +107,11 @@ func checkFromPerspective(word string) bool {
 		log.Println("Error making API call:", err)
 		return false
 	}
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("Error response body: %s ", body)
+		return false
+	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
@@ -121,6 +126,8 @@ func checkFromPerspective(word string) bool {
 		log.Println("Error decoding response body:", err)
 		return false
 	}
+
+	log.Printf("%v %v", respBody.AttributeScores.Toxicity.SummaryScore.Value, resp.StatusCode)
 
 	if respBody.AttributeScores.Toxicity.SummaryScore.Value > 0.3 {
 		RedisClient.SAdd(ctx, "profaneword", word)
