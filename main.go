@@ -310,9 +310,11 @@ func persistData() {
 		}
 		keyType, err := RedisClient.Type(ctx, timeStamp).Result()
 		if err != nil || keyType != "zset" {
+			log.Printf("%v", string(err.Error()))
+			log.Printf("%v", keyType)
 			continue
 		}
-		log.Println(keyType)
+
 		data, err := RedisClient.ZRevRange(ctx, timeStamp, 0, 2).Result()
 		if err != nil {
 			return
@@ -357,7 +359,8 @@ func persistData() {
 		})
 
 		if err != nil {
-			return
+			log.Printf("DB insert failed %v", string(err.Error()))
+			continue
 		}
 
 		log.Printf("Yay word stored: %v \n", newWord)
