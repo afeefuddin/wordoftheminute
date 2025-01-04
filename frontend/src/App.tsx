@@ -79,41 +79,40 @@ function App() {
   });
 
   return (
-    <div class="bg-gray-200 h-screen flex flex-col">
-      <Header showTimer/>
-      {ws() === null ? (
-        <div class="flex items-center justify-center h-full">Connecting...</div>
-      ) : (
-        <>
-          <div class="flex-1 px-4 py-4 overflow-y-auto">
-            <div class="max-w-xl mx-auto">
-              <div class="flex flex-row gap-2">
-                <div class="flex flex-col">
-                  {dataEntries().map((_, idx) => (
-                    <div class="flex gap-2 items-center">
-                      <div class="text-lg">{idx + 1}.</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div class="flex flex-col w-full">
-                  <TransitionGroup name="words-list">
-                    <For each={dataEntries()}>
-                      {(entry) => (
-                        <div class="flex w-full justify-between items-center words-list">
-                          <div class="text-lg">{entry.key}</div>
-                          <div>{entry.value}</div>
-                        </div>
-                      )}
-                    </For>
-                  </TransitionGroup>
+    <div class="bg-gray-200 h-screen">
+      <div class="max-w-4xl h-full mx-auto w-full ">
+        <div class="bg-white px-4 h-full flex flex-col">
+          <Header showTimer />
+          {ws() === null ? (
+            <div class="flex items-center justify-center h-full">
+              Connecting...
+            </div>
+          ) : (
+            <>
+              <div class="flex-1 mx-4 mt-2  overflow-y-auto border-2 border-black">
+                <div class=" mx-auto">
+                  <table class="flex flex-row gap-2">
+                    <tbody class="flex flex-col w-full">
+                      <TransitionGroup name="words-list">
+                        <For each={dataEntries()}>
+                          {(entry, idx) => (
+                            <tr class="border hover:bg-gray-50 px-2 words-list w-full py-2 flex flex-row gap-2 items-center">
+                              <td class="py-2 text-lg">{idx() + 1}.</td>
+                              <td class="py-2 text-lg flex-1">{entry.key}</td>
+                              <td class="py-2 text-end ">{entry.value}</td>
+                            </tr>
+                          )}
+                        </For>
+                      </TransitionGroup>
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </div>
-          </div>
-          <MessageInput />
-        </>
-      )}
+              <MessageInput />
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,13 +12,10 @@ export default function MessageInput() {
   };
 
   return (
-    <div class="px-4  sm:px-8 md:px-16 py-8 border-t border-black">
-      <form
-        class="flex gap-2 sm:gap-4 max-w-2xl mx-auto"
-        onSubmit={sendMessage}
-      >
+    <div class="  w-full py-8  ">
+      <form class="flex gap-2 sm:gap-4 px-4 mx-auto" onSubmit={sendMessage}>
         <input
-          class="flex-1 rounded px-4 py-2 border border-gray-300"
+          class="flex-1 rounded px-4 py-2 border-black border-2"
           type="text"
           value={message()}
           onInput={(e) => setMessage(e.target.value)}
@@ -28,11 +25,11 @@ export default function MessageInput() {
               e.preventDefault();
             }
           }}
-          placeholder="Type your message..."
+          placeholder="Type your favourite word..."
         />
 
         <button
-          class="bg-blue-600 text-white px-4 py-2 rounded"
+          class="bg-black text-white px-4 py-2 "
           type="submit"
           disabled={message().length === 0}
         >
